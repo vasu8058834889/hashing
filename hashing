@@ -1,0 +1,107 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<conio.h>
+ 
+/* Node for storing an item in a Linked List */
+struct node 
+{
+	int key;
+	int value;
+	struct node *next;
+};
+ 
+/* For storing a Linked List at each index of Hash Table  */
+struct arrayitem 
+{
+ 
+	struct node *head;   
+	/* head pointing the first element of Linked List at an index of Hash Table */
+ 
+	struct node *tail;   
+	/* tail pointing the last element of Linked List at an index of Hash Table */
+ 
+};
+ 
+struct arrayitem *array;
+int size = 0;         /* Determines the no. of elements present in Hash Table */
+int max = 10;	      /* Determines the maximum capacity of Hash Table array */
+ 
+/* This function creates an index corresponding to the every given key */
+int hashcode(int key)
+{
+	return (key % max);
+}
+ 
+struct node* get_element(struct node *list, int find_index);
+void remove_element(int key);
+void rehash();
+void init_array();
+ 
+void insert(int key, int value)
+{
+  	float n = 0.0;     
+	/* n => Load Factor, keeps check on whether rehashing is required or not */
+ 
+	int index = hashcode(key);  
+ 
+	/* Extracting Linked List at a given index */
+	struct node *list = (struct node*) array[index].head;
+ 
+	/* Creating an item to insert in the Hash Table */
+	struct node *item = (struct node*) malloc(sizeof(struct node));
+	item->key = key;
+	item->value = value;
+	item->next = NULL;
+ 
+	if (list == NULL) 
+        {
+		/* Absence of Linked List at a given Index of Hash Table */
+ 
+		printf("Inserting %d(key) and %d(value) \n", key, value);
+		array[index].head = item;
+		array[index].tail = item;
+		size++;
+ 
+	}
+        else 
+        {
+		/* A Linked List is present at given index of Hash Table */
+ 
+		int find_index = find(list, key); 
+		if (find_index == -1) 
+                {
+			/*
+			 *Key not found in existing linked list
+			 *Adding the key at the end of the linked list
+			*/
+ 
+			array[index].tail->next = item;
+			array[index].tail = item;
+			size++;
+ 
+		}else 
+                 {
+			/*
+			 *Key already present in linked list
+			 *Updating the value of already existing key
+			*/
+ 
+			struct node *element = get_element(list, find_index);
+			element->value = value;
+ 
+		}
+ 
+	}
+ 
+	//Calculating Load factor
+	n = (1.0 * size) / max;
+	if (n >= 0.75) 
+        {
+		//rehashing
+ 
+		printf("going to rehash\n");
+		rehash();
+ 
+	}
+ 
+}
